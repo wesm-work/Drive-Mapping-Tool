@@ -17,8 +17,9 @@ if ($result -eq 0) {
     $lanId = $env:USERNAME
 
     #Create Root Path
-    $getad = (([adsisearcher]"(&(objectCategory=User)(samaccountname=$lanId))").findall()).properties 
+    $getad = (([adsisearcher]"(&(objectCategory=User)(samaccountname=$lanId))").findall()).properties
     $pathF = $getad.homedirectory
+    $letter = $getad.homedrive
     
 
     #Set Execution Policy - Im not sure if this needs to be set, putting in for now
@@ -34,7 +35,7 @@ if ($result -eq 0) {
     $ErrorActionPreference = "Stop"
     try 
     {
-        New-PSDrive -Name "F" -PSProvider FileSystem -Root "$pathF" -Persist
+        New-PSDrive -Name $letter.SubString(0,1) -PSProvider FileSystem -Root "$pathF" -Persist
         Invoke-Item $pathF.ToString()
         $break
         Write-Output "Your F Drive has been mapped successfully. "
