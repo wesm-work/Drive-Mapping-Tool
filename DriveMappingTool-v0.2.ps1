@@ -23,7 +23,7 @@ if ($result -eq 0) {
 
     #Set Execution Policy - Im not sure if this needs to be set, putting in for now
     try {
-        Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser    
+        Set-ExecutionPolicy -ExecutionPolicy Bypass -Scope CurrentUser    
     }
     catch {
         Write-Host "Processing...."
