@@ -17,7 +17,6 @@ $choices = [System.Management.Automation.Host.ChoiceDescription[]]($fDrive, $oth
 $title = "***Drive Mapping Tool***"
 $message = 'Do you need to map your F drive? or another drive?'
 $result = $Host.UI.PromptForChoice($title, $message, $choices, 0)
-$break
 
 #Logic for choice made
 if ($result -eq 0) {
@@ -35,7 +34,7 @@ if ($result -eq 0) {
     try 
     {
         New-PSDrive -Name $letter.SubString(0,1) -PSProvider FileSystem -Root "$pathF" -Persist
-        Invoke-Item $pathF.ToString()
+        Invoke-Item $letter
         $break
         Write-Output "Your F Drive has been mapped successfully. "
         $break
@@ -52,6 +51,7 @@ if ($result -eq 0) {
     catch [System.ComponentModel.Win32Exception]
     {
         Write-Output "Your F Drive is already mapped"
+        Invoke-Item $letter
         $break
         Read-Host -Prompt "Press Enter to Exit"
     }
@@ -86,7 +86,7 @@ else {
         Write-Output 'Please enter a valid Path'
     }
 
-    Invoke-Item $drive.ToString()
+    Invoke-Item "$($letter):"
     $break
     Write-Output "Your Drive has been mapped successfully. "
     $break
