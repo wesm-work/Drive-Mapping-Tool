@@ -1,6 +1,15 @@
 #variables
 $break = ""
 
+#Set Execution Policy - Im not sure if this needs to be set, putting in for now
+$ErrorActionPreference = "SilentlyContinue"
+try {
+    Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser -Force
+}
+catch {
+    write-warning "$_"
+}
+
 #Ask User what they are wanting to map
 $fDrive = New-Object System.Management.Automation.Host.ChoiceDescription '&F-Drive', 'Choose to map your F Drive'
 $other = New-Object System.Management.Automation.Host.ChoiceDescription '&Other', 'Choose to manually enter the network path you want to map to a drive.'
@@ -21,16 +30,6 @@ if ($result -eq 0) {
     $pathF = $getad.homedirectory
     $letter = $getad.homedrive
     
-
-    #Set Execution Policy - Im not sure if this needs to be set, putting in for now
-    try {
-        Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser -Force 
-    }
-    catch {
-        Write-Host "Processing...."
-    }
-    
-
     #Map Network Drive
     $ErrorActionPreference = "Stop"
     try 
@@ -66,15 +65,6 @@ else {
     $break
     $letter = Read-Host -Prompt 'Choose a letter A-Z that is not being used above'
     $break
-
-    #Set Execution Policy - Im not sure if this needs to be set, putting in for now
-    try {
-        Set-ExecutionPolicy -ExecutionPolicy Unrestricted -Scope CurrentUser    
-    }
-    catch {
-        Write-Host "Processing...."
-    }
-    
 
     $ErrorActionPreference = "Stop"
     try {
