@@ -1,3 +1,13 @@
+<#
+.Synopsis
+    This script allows a user to map their homedrive or another network drive without having to go through the steps
+.Description
+    When the script first loads it gives the user the choice to map their homedrive or another network drive.
+    If the user chooses homedrive, then the script will automatically map that drive. If the user chooses other, then
+    they are able to map another drive path that is already known.
+#>
+
+
 #variables
 $break = ""
 
@@ -13,16 +23,17 @@ $break = ""
 #endregion
 
 #region Do Choice
+
     #Logic for choice made
     if ($result -eq 0) {
 
         #region Get User Information
             #Retrieve LAN ID
-            $lanId = $env:USERNAME
+            $LanId = $env:USERNAME
 
             #Create Root Path
-            $getad = (([adsisearcher]"(&(objectCategory=User)(samaccountname=$lanId))").findall()).properties
-            $pathF = $getad.homedirectory
+            $getad = (([adsisearcher]"(&(objectCategory=User)(samaccountname=$LanId))").findall()).properties
+            $FDrivePath = $getad.homedirectory
             $letter = $getad.homedrive
         #endregion
 
@@ -30,7 +41,7 @@ $break = ""
             $ErrorActionPreference = "Stop"
             try 
             {
-                New-PSDrive -Name $letter.SubString(0,1) -PSProvider FileSystem -Root "$pathF" -Persist
+                New-PSDrive -Name $letter.SubString(0,1) -PSProvider FileSystem -Root "$FDrivePath" -Persist
                 Invoke-Item $letter
                 $break
                 Write-Output "Your F Drive has been mapped successfully. "
@@ -53,46 +64,46 @@ $break = ""
                 Read-Host -Prompt "Press Enter to Exit"
             }
         #endregion
-        
-    }
-    else {
-        #region Get Drive from User Input
-            #Get Information from user 
-            $drive = Read-Host -Prompt 'Enter the Network Drive Path you want to map'
-            Get-PSDrive -PSProvider FileSystem 
-            $break
-            $letter = Read-Host -Prompt 'Choose a letter A-Z that is not being used above'
-            $break
-        #endregion
-        
-        #region Map Drive from User Input
-            $ErrorActionPreference = "Stop"
-            try {
-                New-PSDrive -Name "$letter" -PSProvider FileSystem -Root "$drive" -Persist
-            }
-            catch [System.Management.Automation.SessionStateException]
-            {
-                Write-Output "$drive has been mapped."
-            }
-            catch [System.ComponentModel.Win32Exception]
-            {
-                Write-Output "The $($letter.ToUpper()) drive could not be mapped. Make sure the drive name(letter) is available and you have the correct path."
-                $break
-                Read-Host -Prompt "Press Enter to Exit"
-                break
-            }
-            catch [NotSupportedException]
-            {
-                Write-Output 'Please enter a valid Path'
-            }
-        #endregion
-        
-        #region Open Drive Location and Close
-            Invoke-Item "$($letter):"
-            $break
-            Write-Output "Your Drive has been mapped successfully. "
+    
+}
+else {
+    #region Get Drive from User Input
+        #Get Information from user 
+        $drive = Read-Host -Prompt 'Enter the Network Drive Path you want to map'
+        Get-PSDrive -PSProvider FileSystem 
+        $break
+        $letter = Read-Host -Prompt 'Choose a letter A-Z that is not being used above'
+        $break
+    #endregion
+    
+    #region Map Drive from User Input
+        $ErrorActionPreference = "Stop"
+        try {
+            New-PSDrive -Name "$letter" -PSProvider FileSystem -Root "$drive" -Persist
+        }
+        catch [System.Management.Automation.SessionStateException]
+        {
+            Write-Output "$drive has been mapped."
+        }
+        catch [System.ComponentModel.Win32Exception]
+        {
+            Write-Output "The $($letter.ToUpper()) drive could not be mapped. Make sure the drive name(letter) is available and you have the correct path."
             $break
             Read-Host -Prompt "Press Enter to Exit"
-        #endregion  
-    }
+            break
+        }
+        catch [NotSupportedException]
+        {
+            Write-Output 'Please enter a valid Path'
+        }
+    #endregion
+    
+    #region Open Drive Location and Close
+        Invoke-Item "$($letter):"
+        $break
+        Write-Output "Your Drive has been mapped successfully. "
+        $break
+        Read-Host -Prompt "Press Enter to Exit"
+    #endregion  
+}
 #endregion
